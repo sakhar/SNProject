@@ -4,7 +4,7 @@
  COMS 6998: Social Networks
  Fall 2014
  Computer Science, Columbia University
- Final Project
+ Final Project;
  */
 
 package snproject;
