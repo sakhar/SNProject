@@ -126,7 +126,7 @@ public class Main {
             iNodes.removeAll(tempRem);
         }
 
-        System.out.println(iNodes.size());
+        //System.out.println(iNodes.size());
     }
 
 }
