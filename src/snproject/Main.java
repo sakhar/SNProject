@@ -7,7 +7,7 @@
  Final Project
  */
 
-
+package snproject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -112,14 +112,15 @@ public class Main {
 
     public static void main(String[] args) {
         graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
-        buildGraph("/Users/edwardliu/Downloads/facebook_combined.txt", graph);
+        buildGraph("/Users/sakhar/Dropbox/columbia/Social Networks/SN14-Challenge2ExampleData/G1.txt", graph);
+        //buildGraph("/Users/edwardliu/Downloads/facebook_combined.txt", graph);
         HashSet<String> iNodes = new HashSet<>();
         HashSet<String> rNodes = new HashSet<>();
         System.out.println("graph:" + graph.vertexSet().size());
         Vector<String> vertexSet = new Vector<String>();
         vertexSet.addAll(graph.vertexSet());
         Random r = new Random();
-
+        int nfun = neighborhoodFunction(2);
         for (String s : vertexSet) {
             if (r.nextDouble() < intialI) {
                 iNodes.add(s);
@@ -145,9 +146,12 @@ public class Main {
                 }
             }
             iNodes.removeAll(tempRem);
+            iNodes.addAll(tempNew);
+            rNodes.addAll(tempRem);
         }
 
         System.out.println(iNodes.size());
+        System.out.println(rNodes.size());
     }
 
 }
