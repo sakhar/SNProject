@@ -1,5 +1,5 @@
 /*
- Edward Liu - UNI: eml2170
+ Edward Liu - UNI: eml2170 
  Sakhar Alkhereyf - UNI: sa3147
  COMS 6998: Social Networks
  Fall 2014
@@ -7,15 +7,21 @@
  Final Project
  */
 
-package snproject;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
+
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
 import org.jgrapht.UndirectedGraph;
+import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
@@ -78,7 +84,22 @@ public class Main {
             }
         }
     }
+    
+    /**
+     * Uses Floyd-Warshall to compute all pairs shortest paths in O(n^3)
+     */
+    public static int neighborhoodFunction(int t){
+    	int count = 0;
+    	FloydWarshallShortestPaths<String, DefaultEdge> fw = new FloydWarshallShortestPaths<String, DefaultEdge>(graph);
+    	Collection<GraphPath<String, DefaultEdge>> paths = fw.getShortestPaths();
+    	for(GraphPath<String, DefaultEdge> path : paths){
+    		if(path.getEdgeList().size() >= t)
+    			count++;
+    	}
+    	return count;
+    }
 
+    /*//There is already a function in JGraphT
     public static Vector<String> getNeighbors(UndirectedGraph<String, DefaultEdge> g, String u) {
         Vector<String> neighbors = new Vector<String>();
 
@@ -87,11 +108,11 @@ public class Main {
             neighbors.add(v);
         }
         return neighbors;
-    }
+    }*/
 
     public static void main(String[] args) {
         graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
-        buildGraph("/Users/sakhar/Dropbox/columbia/Social Networks/SN14-Challenge2ExampleData/G1.txt", graph);
+        buildGraph("/Users/edwardliu/Downloads/facebook_combined.txt", graph);
         HashSet<String> iNodes = new HashSet<>();
         HashSet<String> rNodes = new HashSet<>();
         System.out.println("graph:" + graph.vertexSet().size());
@@ -109,7 +130,7 @@ public class Main {
             HashSet<String> tempNew = new HashSet<>();
             HashSet<String> tempRem = new HashSet<>();
             for (String v : iNodes) {
-                Vector<String> neighbors = getNeighbors(graph, v);
+                List<String> neighbors = Graphs.neighborListOf(graph, v);
                 for (String u : neighbors) {
                     if (!rNodes.contains(u)) {
                         if (r.nextDouble() < beta) {
@@ -126,7 +147,7 @@ public class Main {
             iNodes.removeAll(tempRem);
         }
 
-        //System.out.println(iNodes.size());
+        System.out.println(iNodes.size());
     }
 
 }
