@@ -7,7 +7,7 @@
  Final Project
  */
 
-
+package snproject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +34,9 @@ public class Main {
     public static final double intialI = 1.0 / 1000.0; // Initial infected
     public static final int t = 2; // time
     public static UndirectedGraph<String, DefaultEdge> graph;
-
+    public static int neighborhoods[];
+    public static int maxT = 6; // maximum threshold for neighborhoodFunction()
+    
     public static void buildGraph(String path, UndirectedGraph<String, DefaultEdge> g) {
         Scanner input; // declare scanner input to read the input
 
@@ -98,25 +100,28 @@ public class Main {
 		i=10, count=0
      * 
      */
-    public static int neighborhoodFunction(int t){
-    	int count = 0;
+    public static int[] neighborhoodFunction(){
+
 //    	FloydWarshallShortestPaths<String, DefaultEdge> fw = new FloydWarshallShortestPaths<String, DefaultEdge>(graph);
 //    	Collection<GraphPath<String, DefaultEdge>> paths = fw.getShortestPaths();
 //    	for(GraphPath<String, DefaultEdge> path : paths){
 //    		if(path.getEdgeList().size() >= t)
 //    			count++;
 //    	}
+        int values[] = new int[maxT];
     	for(String start : graph.vertexSet()){
     		BellmanFordShortestPath<String, DefaultEdge> bf = new BellmanFordShortestPath<>(graph, start);
-    		for(String end : graph.vertexSet()){	
+                for(String end : graph.vertexSet()){	
     			if(!start.equals(end)){
-	    			if(bf.getCost(end) >= t)
-	    				count++;
+                            for (int i = 0; i < maxT; i++) {
+                                if(bf.getCost(end) > i) // why >?
+                                    values[i]++;
+                            }
     			}
     		}
     	}
-    	System.out.println("i=" + t + ", count=" + count);
-    	return count;
+    	//System.out.println("i=" + t + ", count=" + count);
+    	return values;
     }
 
     /*//There is already a function in JGraphT
@@ -133,7 +138,8 @@ public class Main {
     public static void main(String[] args) {
         graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
         //buildGraph("/Users/sakhar/Dropbox/columbia/Social Networks/SN14-Challenge2ExampleData/G1.txt", graph);
-        buildGraph("/Users/edwardliu/Downloads/facebook_combined.txt", graph);
+        //buildGraph("/Users/edwardliu/Downloads/facebook_combined.txt", graph);
+        buildGraph("/Users/sakhar/Downloads/facebook_combined.txt", graph);
         HashSet<String> iNodes = new HashSet<>();
         HashSet<String> rNodes = new HashSet<>();
         System.out.println("graph:" + graph.vertexSet().size());
@@ -141,9 +147,11 @@ public class Main {
         vertexSet.addAll(graph.vertexSet());
         Random r = new Random();
         
-//        for(int i = 2; i <= 10; i++)
-//        	neighborhoodFunction(i);
         
+        neighborhoods = neighborhoodFunction();
+        for (int i = 0; i < maxT; i++) {
+            System.out.println("n="+neighborhoods[i]);
+        }
         for (String s : vertexSet) {
             if (r.nextDouble() < intialI) {
                 iNodes.add(s);
@@ -171,10 +179,9 @@ public class Main {
             iNodes.removeAll(tempRem);
             iNodes.addAll(tempNew);
             rNodes.addAll(tempRem);
+            System.out.println("i nodes:"+iNodes.size());
+            System.out.println("r nodes:"+rNodes.size());
         }
-
-        System.out.println(iNodes.size());
-        System.out.println(rNodes.size());
     }
 
 }
