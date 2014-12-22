@@ -40,7 +40,7 @@ public class Sampling {
         //HashSet<DefaultEdge> edges = new HashSet<>();
                 
         for (String v:graph.vertexSet()) {
-           if(r.nextDouble()<=0.95)
+           if(r.nextDouble()<=0.90)
                 set.add(v);
         }
         graph.removeAllVertices(set);
@@ -55,10 +55,9 @@ public class Sampling {
                 maxIndex = i;
                 max = connectedSets.get(i).size();
             }
-            System.out.println(connectedSets.get(i).size());
         }
-        System.out.println(connectedSets.get(maxIndex).size());
-        System.out.println(maxIndex);
+        //System.out.println(connectedSets.get(maxIndex).size());
+        //System.out.println(maxIndex);
         for (int i = 0; i < connectedSets.size(); i++) {
             if(i==maxIndex)
                 continue;
@@ -67,6 +66,9 @@ public class Sampling {
         
         System.out.println("nodes:"+graph.vertexSet().size());
         System.out.println("edges:"+graph.edgeSet().size());
+        for (DefaultEdge e:graph.edgeSet()) {
+            System.out.println(graph.getEdgeSource(e)+" "+graph.getEdgeTarget(e));
+        }
         
     }
     public static void buildGraph(String path, Graph<String, DefaultEdge> g) {
