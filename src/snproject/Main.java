@@ -181,8 +181,8 @@ public class Main {
             System.out.println("=========================");
             output += "t:"+i+"\n";
             output += "s:"+(graph.vertexSet().size() - iNodes.size() - rNodes.size())+"\n";
-            output += "r:"+iNodes.size()+"\n";
-            output += "i:"+rNodes.size()+"\n";
+            output += "r:"+rNodes.size()+"\n";
+            output += "i:"+iNodes.size()+"\n";
             output += "================\n";
         }
         System.out.println();
