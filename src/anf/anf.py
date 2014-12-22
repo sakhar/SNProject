@@ -14,34 +14,40 @@ import time
 def getANF(g, h):
 	start_time = time.time()
 
-	UGraph = snap.LoadEdgeList(snap.PUNGraph, g, 0, 1)
+	Graph = snap.LoadEdgeList(snap.PNGraph, g, 0, 1)
 
-	NF = [0]*9 #diameter=8 plus extra first line
+	NF = [0]*(h+1) #diameter=8 plus extra first line
 
-	for v in range(0,UGraph.GetNodes()):
+
+	it = Graph.BegNI()
+	for i in range (0,Graph.GetNodes()):
+		v = it.GetId()
+		
 		SrcNId = v
 		DistNbrsV = snap.TIntFltKdV()
-		snap.GetAnf(UGraph, SrcNId, DistNbrsV, 8, False, 64)
+		snap.GetAnf(Graph, SrcNId, DistNbrsV, h, True, 64)
 
 		#print len(DistNbrsV) prints 2 + diameter
 		#for i=1 to h, prints (i, nbrhood_function_v(i))
-		i = 0
+		j = 0
 		for item in DistNbrsV:
-		    NF[i] = NF[i] + item.Dat()
-		    i = i + 1
+		    NF[j] = NF[j] + item.Dat()
+		    j = j + 1
 
+		it.Next()
 		#print DistNbrsV[len(DistNbrsV)-1].Key() to get nbrh(src, min{diameter, h})
 
 	print 'Output:'
-	for i in range(0,9):
+	for i in range(0,h+1):
 		print NF[i]
-
+	
 
 	elapsed = time.time() - start_time
 	print elapsed
 
 if __name__ == "__main__":
-	g = "facebook_combined.txt"
-	UGraph = snap.LoadEdgeList(snap.PUNGraph, g, 0, 1)
-	h = snap.GetBfsFullDiam(UGraph, 100)
+	g = "twitter-directed.txt"
+	Graph = snap.LoadEdgeList(snap.PNGraph, g, 0, 1)
+	#UGraph = snap.LoadEdgeList(snap.PUNGraph, g, 0, 1)
+	h = snap.GetBfsFullDiam(Graph, 100)
 	getANF(g,h)
