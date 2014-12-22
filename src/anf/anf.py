@@ -9,20 +9,35 @@ Dec 21, 2014
 #!/usr/bin/env python
 import sys
 import snap
+import time
+
+start_time = time.time()
 
 UGraph = snap.LoadEdgeList(snap.PUNGraph, "facebook_combined.txt", 0, 1)
 
+NF = [0]*9 #diameter=8 plus extra first line
 
-SrcNId = 0
-DistNbrsV = snap.TIntFltKdV()
-snap.GetAnf(UGraph, SrcNId, DistNbrsV, 3, False, 64)
+for v in range(0,UGraph.GetNodes()):
+	SrcNId = v
+	DistNbrsV = snap.TIntFltKdV()
+	snap.GetAnf(UGraph, SrcNId, DistNbrsV, 8, False, 64)
 
-#print len(DistNbrsV) prints 2 + diameter
-#for i=1 to h, prints (i, nbrhood_function_v(i))
-for item in DistNbrsV:
-    print item.Key(), item.Dat()
+	#print len(DistNbrsV) prints 2 + diameter
+	#for i=1 to h, prints (i, nbrhood_function_v(i))
+	i = 0
+	for item in DistNbrsV:
+	    NF[i] = NF[i] + item.Dat()
+	    i = i + 1
 
-#print DistNbrsV[len(DistNbrsV)-1].Key() to get nbrh(src, min{diameter, h})
+	#print DistNbrsV[len(DistNbrsV)-1].Key() to get nbrh(src, min{diameter, h})
+
+print 'Output:'
+for i in range(0,9):
+	print NF[i]
+
+
+elapsed = time.time() - start_time
+print elapsed
 
 
 """
