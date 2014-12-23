@@ -12,8 +12,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
@@ -29,14 +34,13 @@ import org.jgrapht.graph.SimpleGraph;
  *
  * @author sakhar
  */
-public class Main {
+public class Undirected {
 
-    public static final double beta = 0.09; //Infection Rate
-    public static final double gamma = 0.1; // Recovery Rate
+    public static final double beta = 0.05; //Infection Rate
+    public static final double gamma = 0.05; // Recovery Rate
     public static final double intialI = 1.0 / 1000.0; // Initial infected
     public static final int t = 100; // time
-    //public static UndirectedGraph<String, DefaultEdge> graph;
-    public static SimpleDirectedGraph<String, DefaultEdge> graph;
+    public static UndirectedGraph<String, DefaultEdge> graph;
     public static int neighborhoods[];
     public static int maxT = 6; // maximum threshold for neighborhoodFunction()
 
@@ -119,23 +123,12 @@ public class Main {
         return values;
     }
 
-    /*//There is already a function in JGraphT
-     public static Vector<String> getNeighbors(UndirectedGraph<String, DefaultEdge> g, String u) {
-     Vector<String> neighbors = new Vector<String>();
-
-     for (DefaultEdge e : g.edgesOf(u)) {
-     String v = g.getEdgeTarget(e).equals(u) ? g.getEdgeSource(e) : g.getEdgeTarget(e);
-     neighbors.add(v);
-     }
-     return neighbors;
-     }*/
     public static void main(String[] args) throws IOException {
-        //graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
-        graph = new SimpleDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
-		//buildGraph("/Users/sakhar/Dropbox/columbia/Social Networks/SN14-Challenge2ExampleData/G1.txt", graph);
+        graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+        
         //buildGraph("/Users/edwardliu/Downloads/facebook_combined.txt", graph);
-        //buildGraph("/Users/sakhar/Downloads/facebook_combined.txt", graph);
-        buildGraph("/Users/sakhar/Dropbox/FinalProject/sampled-datasets/twitter-directed.txt", graph);
+        buildGraph("/Users/sakhar/Downloads/facebook_combined.txt", graph);
+        //buildGraph("/Users/sakhar/Dropbox/FinalProject/sampled-datasets/twitter-directed.txt", graph);
         HashSet<String> iNodes = new HashSet<>();
         HashSet<String> rNodes = new HashSet<>();
         System.out.println("graph:" + graph.vertexSet().size());
@@ -153,29 +146,36 @@ public class Main {
             }
         }
         String output = "";
+        PrintWriter writer = new PrintWriter("/Users/sakhar/Dropbox/FinalProject/facebook/2/sir.csv");
+        writer.print("id");
         for (int i = 0; i < t; i++) {
-            //PrintWriter writer = new PrintWriter("/Users/sakhar/Dropbox/FinalProject/sampled-datasets/twitter/t"+i+".csv");
+            if (i%10==0)
+                writer.print(",t"+i);
+        }
+        writer.println();
+        HashMap<Integer, List<String>> map = new HashMap< Integer, List<String>>();
+        for (int i = 0; i < t; i++) {
+            
             System.out.println("==========t=" + i + "==========");
             HashSet<String> tempNew = new HashSet<>();
             HashSet<String> tempRem = new HashSet<>();
-            //writer.println("node,state");
             for (String v : iNodes) {
                 List<String> neighbors = Graphs.neighborListOf(graph, v);
                 for (String u : neighbors) {
-                    if (!rNodes.contains(u)) {
+                    if (!rNodes.contains(u)&&!tempRem.contains(u)&&!iNodes.contains(u)) {
                         if (r.nextDouble() < beta) {
                             tempNew.add(u);
-                            System.out.println("add " + u + " to infected");
+                            //System.out.println("add " + u + " to infected");
                         }
                     }
                 }
                 if (r.nextDouble() < gamma) {
                     tempRem.add(v);
-                    System.out.println("remove " + v + " from infected");
+                    //System.out.println("remove " + v + " from infected");
                 }
             }
-            iNodes.removeAll(tempRem);
             iNodes.addAll(tempNew);
+            iNodes.removeAll(tempRem);
             rNodes.addAll(tempRem);
             System.out.println("=========================");
             System.out.println("s nodes:" + (graph.vertexSet().size() - iNodes.size() - rNodes.size()));
@@ -187,21 +187,51 @@ public class Main {
             output += "r:"+rNodes.size()+"\n";
             output += "i:"+iNodes.size()+"\n";
             output += "================\n";
-            /*for (String v:iNodes) {
-                writer.println(v+","+2);
-            }
-            for (String v:rNodes) {
-                writer.println(v+","+3);
-            }
+            
+            if(i%10!=0)
+                continue;
+            
             for (String v:vertexSet) {
                 if(rNodes.contains(v)||iNodes.contains(v))
                     continue;
-                writer.println(v+","+1);
+                add(Integer.parseInt(v), "1", map);
+                //writer.println(v+","+1);
             }
-            writer.close();*/
+            
+            for (String v:iNodes) {
+                add(Integer.parseInt(v), "2", map);
+                
+                //writer.println(v+","+2);
+            }
+            for (String v:rNodes) {
+                add(Integer.parseInt(v), "3", map);
+                //writer.println(v+","+3);
+            }
+            
+            
         }
+        
+        for (Entry<Integer, List<String>> e:map.entrySet()) {
+            writer.print(e.getKey());
+            for (int i=0; i<e.getValue().size();i++) {
+                writer.print(","+e.getValue().get(i));
+            }
+            writer.println();
+        }
+        
+        writer.close();
         System.out.println();
         System.out.println(output);
     }
+    
+    // copied from stackoverflow
+    public static void add(Integer key, String newValue,Map<Integer, List<String>> map) {
+    List<String> currentValue = map.get(key);
+    if (currentValue == null) {
+        currentValue = new ArrayList<String>();
+        map.put(key, currentValue);
+    }
+    currentValue.add(newValue);
+}
 
 }

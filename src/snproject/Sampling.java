@@ -31,7 +31,7 @@ public class Sampling {
     public static void main(String args[]){
         
         graph = new SimpleDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
-        buildGraph("/Users/sakhar/Downloads/twitter_combined.txt", graph);
+        buildGraph("/Users/sakhar/Downloads/loc-brightkite_edges.txt", graph);
         System.out.println("nodes:"+graph.vertexSet().size());
         System.out.println("edges:"+graph.edgeSet().size());
         Random r = new Random();
@@ -40,7 +40,7 @@ public class Sampling {
         //HashSet<DefaultEdge> edges = new HashSet<>();
                 
         for (String v:graph.vertexSet()) {
-           if(r.nextDouble()<=0.90)
+           if(r.nextDouble()<=0.80)
                 set.add(v);
         }
         graph.removeAllVertices(set);
@@ -95,8 +95,8 @@ public class Sampling {
             }
             try {
 
-                String firstNode = line.split(" ")[0]; // first node id
-                String secondNode = line.split(" ")[1]; // second node id
+                String firstNode = line.split("\t")[0]; // first node id
+                String secondNode = line.split("\t")[1]; // second node id
                 if (!g.containsVertex(firstNode)) {
                     g.addVertex(firstNode); // if it already exists, nothing will be changed
                 }
